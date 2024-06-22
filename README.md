@@ -7,7 +7,7 @@
 3. Create a `.env` file based on `.env.example`
 4. Type `npm run dev` to start the api in dev mode
 
-## Trying out (and production)
+## Trying it out
 
 1. Make sure docker is installed and running
 2. Create a `.env` file based on `.env.example`
