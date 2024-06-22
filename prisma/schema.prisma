@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Stock {
+  id           Int           @id @default(autoincrement())
+  symbol       String        @unique @db.VarChar(5)
+  createdAt    DateTime      @default(now())
+  priceUpdates PriceUpdate[]
+}
+
+model PriceUpdate {
+  id         Int      @id @default(autoincrement())
+  price      Int
+  updateTime DateTime @default(now())
+  stockId    Int
+  stock      Stock    @relation(fields: [stockId], references: [id])
+}
