@@ -16,3 +16,9 @@
 5. You can access the API's swagger documentation under `http://localhost:3000/api-docs`
 6. PUT `http://localhost:3000/stock/:symbol` to add the stock to the watchlist
 7. GET `http://localhost:3000/stock/:symbol` to get the stock's pricing metrics
+
+### Tech debts
+
+1. Add more unit and integration tests
+2. Add more logging
+3. Add basic api-key protection to routes (not requested)
