@@ -1,33 +1,39 @@
 import { Request, Response } from 'express';
 import { createStock, getStockBySymbol } from '../repositories/stock';
 import { checkSymbolValidity } from '../third-party-apis/finnhubAPI';
-import { getStockMetrics } from '../services/priceUpdate';
+import { calculateStockMetrics } from '../services/priceUpdate';
 
-export const getStock = async (req: Request, res: Response) => {
+export const getStockMetrics = async (req: Request, res: Response) => {
   const {
     prisma,
     redis,
     params: { symbol }
   } = req;
 
-  const stock = await getStockBySymbol(prisma, symbol);
+  try {
+    const stock = await getStockBySymbol(prisma, symbol);
 
-  if (!stock) {
-    res.status(404);
-    throw new Error('Stock not found!');
+    if (!stock) {
+      res.status(404);
+      throw new Error('Stock not found!');
+    }
+
+    const cachedStockMetrics = JSON.parse((await redis.get(symbol)) || 'null');
+
+    if (cachedStockMetrics) {
+      return res.status(200).json(cachedStockMetrics);
+    }
+
+    const stockMetrics = await calculateStockMetrics(prisma, stock.id);
+
+    await redis.set(symbol, JSON.stringify(stockMetrics));
+
+    return res.status(200).json(stockMetrics);
+  } catch (error) {
+    res.json({
+      errorMessage: (error as Error)?.message ?? error
+    });
   }
-
-  const cachedStockMetrics = JSON.parse((await redis.get(symbol)) || 'null');
-
-  if (cachedStockMetrics) {
-    return res.status(200).json(cachedStockMetrics);
-  }
-
-  const stockMetrics = await getStockMetrics(prisma, stock.id);
-
-  await redis.set(symbol, JSON.stringify(stockMetrics));
-
-  return res.status(200).json(stockMetrics);
 };
 
 export const addStock = async (req: Request, res: Response) => {

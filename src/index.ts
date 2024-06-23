@@ -7,6 +7,7 @@ import { prisma } from './prisma';
 import { startStockPriceCheckerJob } from './cron-jobs/jobs';
 import { connectToRedis } from './redis';
 import { PORT } from './config';
+import { setupSwagger } from './swagger';
 
 const logger = createLogger('index');
 
@@ -17,6 +18,8 @@ const startApp = async () => {
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());
+
+    setupSwagger(app);
 
     app.use((req: Request, _, next) => {
       req.prisma = prisma;

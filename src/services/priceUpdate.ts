@@ -12,7 +12,7 @@ export const calculateMovingAverage = (prices: number[]) => {
   return movingAverage;
 };
 
-export const getStockMetrics = async (
+export const calculateStockMetrics = async (
   prisma: PrismaClient,
   stockId: number
 ) => {
